@@ -51,7 +51,7 @@ jobs:
           echo "{ 
             \"domain_ips\": $DOMAIN_IPS_JSON,
             \"final_ip\": $FINAL_IP_JSON
-          }" | jq . > unity.json
+          }" | jq . > UnityCdnIPs.json
           
           # 显示生成的文件内容
           cat UnityCdnIPs.json
