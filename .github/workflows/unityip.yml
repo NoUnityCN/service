@@ -5,6 +5,9 @@ on:
   schedule:
     - cron: '00 23 * * *'
 
+permissions:
+  contents: write
+
 jobs:
   resolve-ip:
     runs-on: ubuntu-latest
@@ -53,7 +56,7 @@ jobs:
           # 显示生成的文件内容
           cat UnityCdnIPs.json
 
-      - name: 发布IP
+      - name: 发布Unity CDN IP
         uses: softprops/action-gh-release@v2
         with:
           files: |
