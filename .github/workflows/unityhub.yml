@@ -16,12 +16,12 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Download installers
+    - name: 下载Unity Hub安装介质
       run: |
          curl -o UnityHubSetup.exe "https://public-cdn.cloud.unity3d.com/hub/prod/UnityHubSetup.exe"
          curl -o UnityHubSetup.dmg "https://public-cdn.cloud.unity3d.com/hub/prod/UnityHubSetup.dmg"
 
-    - name: UnityHub
+    - name: 发布Unity Hub
       uses: softprops/action-gh-release@v2
       with:
         files: |
