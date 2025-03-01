@@ -1,0 +1,35 @@
+name: Get Unity Download IP
+
+on:
+  workflow_dispatch: # 允许手动触发
+
+jobs:
+  get-ip:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install dnsutils (for dig)
+        run: sudo apt-get update && sudo apt-get install -y dnsutils
+
+      - name: Resolve IP addresses
+        id: resolve-ip
+        run: |
+          # 使用 dig 查询域名并提取 IPv4 地址
+          IPS=$(dig +short download.unity3d.com | grep -E '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$')
+          
+          # 将换行符替换为逗号（用于输出）
+          UNITY_IPS=$(echo "$IPS" | tr '\n' ',')
+          
+          # 移除最后一个逗号（如果有）
+          UNITY_IPS=${UNITY_IPS%,}
+          
+          # 输出结果到 GitHub Action 变量
+          echo "IP addresses: $UNITY_IPS"
+          echo "ips=$UNITY_IPS" >> $GITHUB_OUTPUT
+
+      - name: Use the IP addresses
+        run: |
+          echo "Resolved IPs: ${{ steps.resolve-ip.outputs.ips }}"
+          # 这里可以添加后续操作，例如：
+          # - 写入 hosts 文件
+          # - 在构建脚本中使用这些 IP
+          # - 保存为构建产物等
