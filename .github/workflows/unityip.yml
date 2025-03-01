@@ -1,7 +1,9 @@
 name: Get Unity File IP
 
 on:
-  workflow_dispatch:  # 手动触发
+  workflow_dispatch:
+  schedule:
+    - cron: '00 23 * * *'
 
 jobs:
   resolve-ip:
@@ -10,7 +12,7 @@ jobs:
       - name: 安装依赖工具
         run: |
           sudo apt-get update
-          sudo apt-get install -y curl dnsutils
+          sudo apt-get install -y curl dnsutils jq
 
       - name: 解析域名 IP
         id: domain-ip
@@ -32,3 +34,28 @@ jobs:
         run: |
           echo "download.unity3d.com 的 IP 地址: ${{ steps.domain-ip.outputs.domain_ips }}"
           echo "文件最终下载地址的 IP: ${{ steps.final-ip.outputs.final_ip }}"
+          echo "需要设置Host: download.unity3d.com"
+
+      - name: 创建IP列表JSON文件
+        run: |
+          # 将逗号分隔的IP转换为JSON数组
+          DOMAIN_IPS_JSON=$(echo "${{ steps.domain-ip.outputs.domain_ips }}" | tr ',' '\n' | jq -R . | jq -s .)
+          
+          # 将最终IP包装为单元素数组
+          FINAL_IP_JSON=$(echo "${{ steps.final-ip.outputs.final_ip }}" | jq -R . | jq -s .)
+          
+          # 合并为JSON对象并保存
+          echo "{ 
+            \"domain_ips\": $DOMAIN_IPS_JSON,
+            \"final_ip\": $FINAL_IP_JSON
+          }" | jq . > unity.json
+          
+          # 显示生成的文件内容
+          cat UnityCdnIPs.json
+
+      - name: 发布IP
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            UnityCdnIPs.json
+          tag_name: unityip
