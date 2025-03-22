@@ -3,8 +3,8 @@
 
 **UnityHub 下載**：[![UnityHub Installer Download](https://github.com/NoUnityCN/service/actions/workflows/hub.yml/badge.svg)](https://github.com/NoUnityCN/service/actions/workflows/hub.yml)
 
-**Releases 获取**：[![Get Unity Releases](https://github.com/NoUnityCN/service/actions/workflows/releases.yml/badge.svg)](https://github.com/NoUnityCN/service/actions/workflows/releases.yml)
+**Releases 獲取**：[![Get Unity Releases](https://github.com/NoUnityCN/service/actions/workflows/releases.yml/badge.svg)](https://github.com/NoUnityCN/service/actions/workflows/releases.yml)
 
-**文件 CDN 索引**：[![Get Unity File IP](https://github.com/NoUnityCN/service/actions/workflows/ip.yml/badge.svg)](https://github.com/NoUnityCN/service/actions/workflows/ip.yml)
+** CDN 檔案索引**：[![Get Unity File IP](https://github.com/NoUnityCN/service/actions/workflows/ip.yml/badge.svg)](https://github.com/NoUnityCN/service/actions/workflows/ip.yml)
 
 [返回主站](https://nounitycn.top)
