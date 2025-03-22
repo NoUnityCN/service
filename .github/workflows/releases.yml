@@ -42,4 +42,4 @@ jobs:
           BETA.json
           ALPHA.json
           TECH.json
-        tag_name: unity-releases 
+        tag_name: releases

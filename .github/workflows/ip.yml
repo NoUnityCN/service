@@ -61,4 +61,4 @@ jobs:
         with:
           files: |
             UnityCdnIPs.json
-          tag_name: unityip
+          tag_name: ips
