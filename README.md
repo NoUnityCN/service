@@ -5,6 +5,6 @@
 
 **Releases 獲取**：[![Get Unity Releases](https://github.com/NoUnityCN/service/actions/workflows/releases.yml/badge.svg)](https://github.com/NoUnityCN/service/actions/workflows/releases.yml)
 
-** 檔案 CDN 索引 **：[![Get Unity File IP](https://github.com/NoUnityCN/service/actions/workflows/ip.yml/badge.svg)](https://github.com/NoUnityCN/service/actions/workflows/ip.yml)
+**檔案 CDN 索引**：[![Get Unity File IP](https://github.com/NoUnityCN/service/actions/workflows/ip.yml/badge.svg)](https://github.com/NoUnityCN/service/actions/workflows/ip.yml)
 
 [返回主站](https://nounitycn.top)
