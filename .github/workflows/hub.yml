@@ -20,6 +20,8 @@ jobs:
       run: |
          curl -o UnityHubSetup.exe "https://public-cdn.cloud.unity3d.com/hub/prod/UnityHubSetup.exe"
          curl -o UnityHubSetup.dmg "https://public-cdn.cloud.unity3d.com/hub/prod/UnityHubSetup.dmg"
+         curl -o UnityHubSetupBeta-arm64.dmg "https://public-cdn.cloud.unity3d.com/hub/prod/UnityHubSetupBeta-arm64.dmg"
+         
 
     - name: 发布Unity Hub
       uses: softprops/action-gh-release@v2
@@ -27,4 +29,5 @@ jobs:
         files: |
           UnityHubSetup.exe
           UnityHubSetup.dmg
+          UnityHubSetupBeta-arm64.dmg
         tag_name: unityhub
