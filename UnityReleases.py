@@ -164,9 +164,10 @@ def categorize_releases(json_data):
 
     categories = {
         'LTS': [],
+        'SUPPORTED': [],  # 新增支持版本类别
         'BETA': [],
         'ALPHA': [],
-        'TECH': []
+        'TECH': [],
     }
 
     for edge in edges:
@@ -185,6 +186,8 @@ def categorize_releases(json_data):
 
         if 'LTS' in stream:
             categories['LTS'].append(link_info)
+        elif 'SUPPORTED' in stream:  # 新增判断条件
+            categories['SUPPORTED'].append(link_info)
         elif 'BETA' in stream or 'beta' in stream.lower():
             categories['BETA'].append(link_info)
         elif 'ALPHA' in stream or 'alpha' in stream.lower():
@@ -200,7 +203,7 @@ def save_results_to_json(all_versions_by_category):
     
     Args:
         all_versions_by_category: 包含所有版本的分类字典 
-            格式: {'LTS': {'6000': [...], '2023': [...]}, 'BETA': {...}, ...}
+            格式: {'LTS': {...}, 'SUPPORTED': {...}, 'BETA': {...}, ...}  # 更新格式说明
     """
     # 确保输出目录存在
     output_dir = os.path.dirname(os.path.abspath(__file__))
@@ -242,6 +245,7 @@ if __name__ == "__main__":
     # 收集所有版本数据，按类别分组
     all_versions_by_category = {
         'LTS': {},
+        'SUPPORTED': {},  # 新增支持版本存储
         'BETA': {},
         'ALPHA': {},
         'TECH': {}
