@@ -42,4 +42,5 @@ jobs:
           BETA.json
           ALPHA.json
           TECH.json
+          unity_6000_raw.json
         tag_name: releases
