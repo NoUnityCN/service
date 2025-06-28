@@ -33,7 +33,17 @@ jobs:
     - name: 显示生成的文件
       run: |
         ls -la *.json
+        ls -la single_version/*.json
         
+    - name: 复制所需JSON
+      run: |
+        # 找到最新的6000版本原始JSON文件
+        LATEST_6000=$(ls -t single_version/unity_6000_raw_*.json | head -1)
+        echo "找到最新的6000原始JSON: $LATEST_6000"
+        
+        # 复制到根目录作为固定文件名
+        cp "$LATEST_6000" ./unity_6000_raw.json
+
     - name: 发布Unity版本JSON文件
       uses: softprops/action-gh-release@v2
       with:
