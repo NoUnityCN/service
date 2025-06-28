@@ -186,8 +186,9 @@ def categorize_releases(json_data):
 
         if 'LTS' in stream:
             categories['LTS'].append(link_info)
-        elif 'SUPPORTED' in stream:  # 新增判断条件
+        elif 'SUPPORTED' in stream:
             categories['SUPPORTED'].append(link_info)
+            categories['TECH'].append(link_info)  # 同时添加到TECH类别
         elif 'BETA' in stream or 'beta' in stream.lower():
             categories['BETA'].append(link_info)
         elif 'ALPHA' in stream or 'alpha' in stream.lower():
