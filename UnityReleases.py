@@ -4,9 +4,9 @@ import time
 import os
 
 
-def get_unity_releases(version:str):
+def get_unity_releases(version: str):
     url = "https://services.unity.com/graphql"
-    
+
     headers = {
         "Authority": "services.unity.com",
         "Accept": "*/*",
@@ -72,12 +72,12 @@ def get_unity_releases(version:str):
 
         # 解析JSON
         json_data = json.loads(content)
-        
+
         # 提取数据
         process_response_data(json_data)
-        
-        # 返回所有版本的Unity Hub链接
-        return categorize_releases(json_data)
+
+        # 返回所有版本的Unity Hub链接和原始JSON数据
+        return categorize_releases(json_data), json_data
 
     except requests.exceptions.RequestException as e:
         print(f"网络请求失败: {str(e)}")
@@ -91,8 +91,9 @@ def get_unity_releases(version:str):
         print(f"未处理异常: {str(e)}")
         if response:
             debug_response(response)
-    
-    return {}
+
+    return {}, {}
+
 
 def handle_content_encoding(response):
     """处理内容编码"""
@@ -104,6 +105,7 @@ def handle_content_encoding(response):
     except Exception as e:
         print(f"解压失败，尝试原始解码: {str(e)}")
         return response.content.decode('utf-8', errors='replace')
+
 
 def decompress_brotli(data):
     """多重尝试 Brotli 解压"""
@@ -119,10 +121,11 @@ def decompress_brotli(data):
         except Exception as e:
             raise ValueError(f"Brotli 解压失败: {str(e)}")
 
+
 def process_response_data(json_data):
     """处理并格式化输出数据"""
     releases = json_data.get('data', {}).get('getUnityReleases', {})
-    
+
     print(f"找到 {releases.get('totalCount', 0)} 个版本")
     for idx, edge in enumerate(releases.get('edges', []), 1):
         node = edge.get('node', {})
@@ -132,16 +135,17 @@ def process_response_data(json_data):
         print(f"• 发布渠道: {node.get('stream')}")
         print(f"• Hub链接: {node.get('unityHubDeepLink')}")
 
+
 def debug_response(response):
     """输出调试信息"""
     if not response:
         return
-    
+
     print("\n" + "="*40 + " 调试信息 " + "="*40)
     print(f"状态码: {response.status_code}")
     print("响应头:")
     print(json.dumps(dict(response.headers), indent=2))
-    
+
     if response.content:
         try:
             print("\n响应内容 (截取):")
@@ -149,35 +153,36 @@ def debug_response(response):
         except:
             print("原始内容 (十六进制):")
             print(response.content[:100].hex())
-    
+
     print("="*93 + "\n")
+
 
 def categorize_releases(json_data):
     """将所有版本按类型分类"""
     releases = json_data.get('data', {}).get('getUnityReleases', {})
     edges = releases.get('edges', [])
-    
+
     categories = {
         'LTS': [],
         'BETA': [],
         'ALPHA': [],
         'TECH': []
     }
-    
+
     for edge in edges:
         node = edge.get('node', {})
         stream = node.get('stream', '')
         hub_link = node.get('unityHubDeepLink')
         version = node.get('version')
-        
+
         if not hub_link:
             continue
-            
+
         link_info = {
             'version': version,
             'link': hub_link
         }
-        
+
         if 'LTS' in stream:
             categories['LTS'].append(link_info)
         elif 'BETA' in stream or 'beta' in stream.lower():
@@ -186,8 +191,9 @@ def categorize_releases(json_data):
             categories['ALPHA'].append(link_info)
         elif 'TECH' in stream:
             categories['TECH'].append(link_info)
-    
+
     return categories
+
 
 def save_results_to_json(all_versions_by_category):
     """将结果保存为JSON文件
@@ -198,7 +204,7 @@ def save_results_to_json(all_versions_by_category):
     """
     # 确保输出目录存在
     output_dir = os.path.dirname(os.path.abspath(__file__))
-    
+
     # 为每个类别创建一个JSON文件
     for category, versions_dict in all_versions_by_category.items():
         filename = os.path.join(output_dir, f"{category}.json")
@@ -206,10 +212,33 @@ def save_results_to_json(all_versions_by_category):
             json.dump(versions_dict, f, indent=2, ensure_ascii=False)
         print(f"已保存 {category} 版本到 {filename}")
 
+
+def save_raw_json(raw_jsons, output_dir=None):
+    """保存原始JSON数据到文件
+    
+    Args:
+        raw_jsons: 字典，键为版本号，值为原始JSON数据
+        output_dir: 输出目录，默认为脚本所在目录
+    """
+    if output_dir is None:
+        output_dir = os.path.dirname(os.path.abspath(__file__))
+    
+    # 创建原始JSON保存目录
+    raw_dir = os.path.join(output_dir, "raw_jsons")
+    os.makedirs(raw_dir, exist_ok=True)
+    
+    # 保存每个版本的原始JSON
+    for version, json_data in raw_jsons.items():
+        filename = os.path.join(raw_dir, f"unity_{version}_raw.json")
+        with open(filename, 'w', encoding='utf-8') as f:
+            json.dump(json_data, f, indent=2, ensure_ascii=False)
+        print(f"已保存 {version} 原始JSON到 {filename}")
+
+
 if __name__ == "__main__":
     # 在这里直接指定要查询的版本
     versions = ["6000", "2023", "2022", "2021", "2020", "2019", "2018", "2017", "5"]
-    
+
     # 收集所有版本数据，按类别分组
     all_versions_by_category = {
         'LTS': {},
@@ -218,28 +247,42 @@ if __name__ == "__main__":
         'TECH': {}
     }
     
+    # 收集所有原始JSON数据
+    all_raw_jsons = {}
+
     # 转换版本号为API需要的格式
     for i, version in enumerate(versions):
-        print(f"\n===== 查询Unity {version} 版本 =====")
-        categories = get_unity_releases(version)
+        print(f"\n{'='*30} 查询Unity {version} 版本 {'='*30}")
+        result = get_unity_releases(version)
         
+        # 检查是否成功获取数据
+        if not result or not result[0]:
+            print(f"未找到 {version} 版本的数据")
+            continue
+            
+        categories, raw_json = result
+        all_raw_jsons[version] = raw_json
+
         for category, releases in categories.items():
             if releases:
                 print(f"\n{category} 版本 ({len(releases)}个):")
                 # 提取这个类别下当前版本的所有链接
                 links = [release['link'] for release in releases]
-                
+
                 # 添加到相应的类别中
                 if version not in all_versions_by_category[category]:
                     all_versions_by_category[category][version] = links
-                
+
                 # 打印链接
                 for link in links:
                     print(link)
-        
+
         # 在多个版本请求之间添加间隔，避免服务器拒绝请求
         if i < len(versions) - 1:
             time.sleep(3)
-    
+
     # 保存结果到JSON文件
     save_results_to_json(all_versions_by_category)
+    
+    # 保存原始JSON数据
+    save_raw_json(all_raw_jsons)
